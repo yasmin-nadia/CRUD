@@ -1,6 +1,6 @@
 const path = require("path");
 const fs = require("fs").promises;
-const Product = require("./productClass");
+const Product = require("./model/productClass");
 const { success, failure } = require("./common");
 const express = require("express")
 const app = express();

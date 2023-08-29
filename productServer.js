@@ -1,7 +1,7 @@
 const http = require("http");
 const path = require("path");
 const fs = require("fs").promises;
-const Product = require("./productClass");
+const Product = require("./model/productClass");
 const { success, failure } = require("./common");
 const server = http.createServer(async function (req, res) {
 
