@@ -56,7 +56,7 @@ const createValidationUpdate = async (req, res, next) => {
         }
         return true;
     });
-    if (req.body.hasOwnProperty("name")&&(matchingItems.length>1)){
+    if (req.body.hasOwnProperty("name") && (matchingItems.length > 1)) {
         message.push("You cannot update multiple data with the same name");
 
     }
@@ -77,7 +77,160 @@ const createValidationUpdate = async (req, res, next) => {
     }
     else {
         next();
+
+    }
+}
+const createValidationStock = async (req, res, next) => {
+    const message = [];
+
+    const allowedKeys = ["buyer_id", "amount"];
+    const bodyKeys = Object.keys(req.body);
+
+    if (!bodyKeys.every(key => allowedKeys.includes(key))) {
+        message.push("Please provide only 'buyer_id' and 'amount' in the request body");
+    }
+
+
+    if (!isNaN(req.body.amount)) {
+        const amount = parseInt(req.body.amount);
+        if (!Number.isInteger(amount)) {
+            message.push("'amount' has to be an integer");
+        }
+        else if(amount<=0){
+            
+            message.push("'amount' has to be greater than 0");
+        }
+    } else {
+        message.push("'amount' has to be in number format");
+    }
+
+    if (!isNaN(req.body.buyer_id)) {
+        const buyerId = parseInt(req.body.buyer_id);
+        if (!Number.isInteger(buyerId)) {
+            message.push("'buyer_id' has to be an integer");
+        }
+    } else {
+        message.push("'buyer_id' has to be in number format");
+    }
+
+    if (message.length > 0) {
+        return res.status(400).send({ message: message.join(", ") });
+    } else {
+        next();
+    }
+}
+const createValidationAddStock = async (req, res, next) => {
+    const message = [];
+
+    const allowedKeys = ["admin_id", "amount"];
+    const bodyKeys = Object.keys(req.body);
+
+    if (!bodyKeys.every(key => allowedKeys.includes(key))) {
+        message.push("Please provide only 'admin_id' and 'amount' in the request body");
+    }
+
+
+    if (!isNaN(req.body.amount)) {
+        const amount = parseInt(req.body.amount);
+        if (!Number.isInteger(amount)) {
+            message.push("'amount' has to be an integer");
+        }
+    } else {
+        message.push("'amount' has to be in number format");
+    }
+
+    if (!isNaN(req.body.admin_id)) {
+        const buyerId = parseInt(req.body.admin_id);
+        if (!Number.isInteger(buyerId)) {
+            message.push("'admin_id' has to be an integer");
+        }
+    } else {
+        message.push("'admin_id' has to be in number format");
+    }
+
+    if (message.length > 0) {
+        return res.status(400).send({ message: message.join(", ") });
+    } else {
+        next();
+    }
+}
+const createValidationRating = async (req, res, next) => {
+    const message = [];
+
+    const allowedKeys = ["buyer_id", "rate"];
+    const bodyKeys = Object.keys(req.body);
+
+    if (!bodyKeys.every(key => allowedKeys.includes(key))) {
+        message.push("Please provide only 'buyer_id' and 'rating' in the request body");
+    }
+
+
+    if (!isNaN(req.body.rate)) {
+        const rate = parseInt(req.body.rate);
+        if (!Number.isInteger(rate)) {
+            message.push("'rate' has to be an integer");
+        }
+    } else {
+        message.push("'rate' has to be in number format");
+    }
+
+    if (!isNaN(req.body.buyer_id)) {
+        const buyerId = parseInt(req.body.buyer_id);
+        if (!Number.isInteger(buyerId)) {
+            message.push("'buyer_id' has to be an integer");
+        }
+        else if (req.body.rate < 0 || req.body.rate> 5) {
+            message.push("'rate' has to be between 0 and 5");
+        }
+    } else {
+        message.push("'buyer_id' has to be in number format");
+    }
+
+    if (message.length > 0) {
+        return res.status(400).send({ message: message.join(", ") });
+    } else {
+        next();
     }
 }
 
-module.exports = {createValidation,createValidationUpdate};
+const createValidationDiscount= async (req, res, next) => {
+    const message = [];
+
+    const allowedKeys = ["admin_id", "discount"];
+    const bodyKeys = Object.keys(req.body);
+
+    if (!bodyKeys.every(key => allowedKeys.includes(key))) {
+        message.push("Please provide only 'admin_id' and 'discount' in the request body");
+    }
+
+
+    if (!isNaN(req.body.discount)) {
+        const rate = parseInt(req.body.discount);
+        if (!Number.isInteger(rate)) {
+            message.push("'discount' has to be an integer");
+        }
+    } else {
+        message.push("'discount' has to be in number format");
+    }
+
+    if (!isNaN(req.body.admin_id)) {
+        const buyerId = parseInt(req.body.admin_id);
+        if (!Number.isInteger(buyerId)) {
+            message.push("'admin_id' has to be an integer");
+        }
+        else if (req.body.discount < 0 || req.body.discount> 1) {
+            message.push("'discount' has to be between 0 and 1");
+        }
+    } else {
+        message.push("'admin_id' has to be in number format");
+    }
+
+    if (message.length > 0) {
+        return res.status(400).send({ message: message.join(", ") });
+    } else {
+        next();
+    }
+}
+
+
+module.exports = { createValidation, createValidationUpdate, createValidationStock, createValidationRating ,createValidationAddStock,createValidationDiscount};
