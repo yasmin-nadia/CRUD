@@ -6,16 +6,16 @@ const Admin = require("../model/adminClass");
 const { success, failure } = require("../common");
 const express = require("express")
 const app = express();
-const { validatorController } = require("express-validator");
+const { validationResult } = require("express-validator");
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 class productController {
     async create(req, res, next) {
         try {
             console.log("hiiii");
-            console.log(validatorController(req));
+            console.log(validationResult(req));
 
-            const validation = validatorController(req).array();
+            const validation = validationResult(req).array();
             console.log("helloo", validation.length);
             if (validation.length > 0) {
                 return res.status(422).send({ message: "validation error", validation });
@@ -26,7 +26,7 @@ class productController {
 
         }
         catch (error) {
-            console.log("catch has worked")
+            console.log("catch has worked",error)
             return res.status(422).send({ message: "catch has worked" });
 
         }
