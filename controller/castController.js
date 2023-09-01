@@ -158,26 +158,42 @@ class castController {
     async createTransaction(req, res) {
         try {
             const { buyer, mangas } = req.body;
-            const newTransaction = new transactionsModel({ buyer, mangas })
-            // const newTransaction= await transactionsModel.create({buyer,mangas});
-            console.log(newTransaction);
 
-            await newTransaction.save().
-                then((data) => {
-                    return res.status(200).send(success("one transaction has been created", { Transaction: data }));
-                }).
-                catch((err) => {
+            for (const manga of mangas) {
+                const mangaItem = await mangasModel.findById(manga.id);
+
+                console.log(mangaItem, "mangaItem")
+
+                if (!mangaItem) {
+                    return res.status(404).send(failure(`Manga with ID ${manga.id} not found`));
+                }
+
+                if (mangaItem.stock < manga.quantity) {
+                    return res.status(400).send(failure(`Insufficient stock for manga ${mangaItem.name}`));
+                }
+
+
+                mangaItem.stock -= manga.quantity;
+                await mangaItem.save();
+            }
+
+
+            const newTransaction = new transactionsModel({ buyer, mangas });
+
+            await newTransaction.save()
+                .then((data) => {
+                    return res.status(200).send(success("One transaction has been created", { Transaction: data }));
+                })
+                .catch((err) => {
                     console.log(err);
-                    return res.status(200).send(failure("Failed to add the transaction"));
-
+                    return res.status(500).send(failure("Failed to add the transaction"));
                 });
-
-        }
-        catch (error) {
+        } catch (error) {
             console.log("Error while creating transaction", error);
             return res.status(500).send(failure("Internal server error"));
         }
     }
+
     async getAllMangas(req, res) {
         try {
             const casts = await mangasModel.find({});
@@ -204,15 +220,15 @@ class castController {
             }
             if (pass === "123") {
                 transaction = await transactionsModel.find({})
-                .populate(
-                  'buyer.id'
-                
-                )
-                .populate(
-                 'mangas.id'
-                 
-                );
-              
+                    .populate(
+                        'buyer.id', "-_id"
+
+                    )
+                    .populate(
+                        'mangas.id', "-_id"
+
+                    );
+
             }
             if (transaction.length > 0) {
                 return res.status(200).send(success("Here is your transactions", transaction))
@@ -228,6 +244,100 @@ class castController {
 
         }
     }
+
+    async addTransaction(req, res) {
+        try {
+            const { id } = req.query;
+            const { mangaIdd, amount } = req.body;
+            console.log("transaction Id", id)
+
+            const existingTransaction = await transactionsModel.findById(id);
+
+            if (!existingTransaction) {
+                return res.status(404).send(failure("Transaction not found"));
+            }
+            const existingManga = existingTransaction.mangas.find((m) => m.id.toString() === mangaIdd);
+            if (existingManga) {
+
+                existingManga.amount += amount;
+                const updatedTransaction = await existingTransaction.save();
+                return res.status(200).send(success("Manga added to the transaction", updatedTransaction));
+            } else {
+
+
+                const manga = await mangasModel.findById(mangaIdd);
+
+                if (!manga) {
+                    return res.status(404).send(failure(`Manga with ID ${mangaIdd} not found`));
+                }
+
+                if (manga.stock < amount) {
+                    return res.status(400).send(failure(`Insufficient stock for manga ${manga.name}`));
+                }
+
+
+                const mangaObject = {
+                    id: mangaIdd,
+                    amount,
+                };
+            }
+
+            existingTransaction.mangas.push(mangaObject);
+
+
+            manga.stock -= amount;
+            await manga.save();
+
+            // Save the updated transaction with the new manga
+            const updatedTransaction = await existingTransaction.save();
+
+            return res.status(200).send(success("Manga added to the transaction", updatedTransaction));
+        } catch (error) {
+            console.log("Error while adding manga to transaction", error);
+            return res.status(500).send(failure("Internal server error"));
+        }
+    }
+
+
+    async transactionPrice(req, res) {
+        try {
+            const { id } = req.query;
+            // const transaction2=await transactionsModel.findById(id);
+            // console.log("transaction2",transaction2,"id",id)
+            const transaction = await transactionsModel.findById(id).populate('mangas.id');
+
+            if (!transaction) {
+                return res.status(200).send(success("No transaction to show"));
+            }
+
+            let totalPrice = 0;
+            for (const mangaTransaction of transaction.mangas) {
+                const { id, quantity } = mangaTransaction;
+
+                const manga = await mangasModel.findById(id);
+
+                if (manga) {
+
+                    const mangaPrice = manga.price * quantity;
+
+                    totalPrice += mangaPrice;
+                }
+            }
+
+            console.log("totalPrice", totalPrice);
+            return res.status(200).send(success("The total price of the given transaction", totalPrice));
+        } catch (error) {
+            console.error("Error calculating total price:", error);
+            return res.status(500).send(failure("Internal Server errror"));
+        }
+    }
+
+
+
+
+
+
+
 
     async notFound(req, res) {
         return res.status(404).send(success({ message: "URL Not found" }));

@@ -7,8 +7,8 @@ const transactionsSchema = new mongoose.Schema({
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "buyers", 
             }
-        },
-    ],
+        }],
+    
     
     mangas: [
         {
@@ -17,6 +17,7 @@ const transactionsSchema = new mongoose.Schema({
                 ref: "mangas",
             },
             quantity: Number,
+            
         },
     ],
     

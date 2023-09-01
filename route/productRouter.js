@@ -6,15 +6,18 @@ const castController = require("../controller/castController");
 const {createValidation,createValidationUpdate,createValidationStock,createValidationRating,createValidationAddStock,createValidationDiscount} =require("../middleware/validation");
 const validator=require("../middleware/validation2");
 const castCreateValidation=require("../middleware/castValidation");
-routes.get("/all", castController.getAll);
-routes.post("/create", castCreateValidation, castController.create);
-routes.get("/getbyid", castController.getById);
-routes.get("/getbyimdb", castController.getByImdb);
-routes.delete("/deletebyid", castController.deleteById);
-routes.put("/updatebyid", castController.updateMovie);
+// routes.get("/all", castController.getAll);
+// routes.post("/create", castCreateValidation, castController.create);
+// routes.get("/getbyid", castController.getById);
+// routes.get("/getbyimdb", castController.getByImdb);
+// routes.delete("/deletebyid", castController.deleteById);
+// routes.put("/updatebyid", castController.updateMovie);
 routes.post("/createtransaction",castController.createTransaction);
 routes.get("/getalltransactions",castController.getAllTransactions);
 routes.get("/getallmangas",castController.getAllMangas);
+routes.get("/getmangaprice",castController.transactionPrice);
+routes.put("/addtransaction",castController.addTransaction);
+
 
 
 // routes.get("/all", productController.getAll);
