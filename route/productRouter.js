@@ -12,6 +12,9 @@ routes.get("/getbyid", castController.getById);
 routes.get("/getbyimdb", castController.getByImdb);
 routes.delete("/deletebyid", castController.deleteById);
 routes.put("/updatebyid", castController.updateMovie);
+routes.post("/createtransaction",castController.createTransaction);
+routes.get("/getalltransactions",castController.getAllTransactions);
+
 // routes.get("/all", productController.getAll);
 // routes.get("/field", productController.getByField);
 // routes.delete("/delete", productController.delete);

@@ -3,6 +3,10 @@ const fs = require("fs").promises;
 const { success, failure } = require("../common");
 const castModel=require("../model/user")
 const moviesModel=require("../model/movies")
+const directorsModel=require("../model/director")
+const buyersModel=require("../model/buyer")
+const mangasModel=require("../model/mangas")
+const transactionsModel=require("../model/transaction")
 const express = require("express")
 const app = express();
 const { validationResult } = require("express-validator");
@@ -148,6 +152,57 @@ class castController{
         } catch (error) {
             console.log("Error while updating movie", error);
             return res.status(500).send(failure("Failed to update movie"));
+        }
+    }
+
+    async createTransaction(req,res){
+        try{
+            const{buyer,mangas}=req.body;
+            const newTransaction=new transactionsModel({buyer,mangas})
+            // const newTransaction= await transactionsModel.create({buyer,mangas});
+            console.log(newTransaction);
+
+            await newTransaction.save().
+            then((data)=>{
+                return res.status(200).send(success("one transaction has been created", {Transaction:data}));
+            }).
+            catch((err)=>{
+                console.log(err);
+                return res.status(200).send(failure("Failed to add the transaction"));
+
+            });
+           
+        }
+        catch(error){
+            console.log("Error while creating transaction",error);
+            return res.status(500).send(failure("Internal server error"));
+        }
+    }
+
+    async getAllTransactions(req,res){
+        try{
+            const {pass}=req.query;
+            let transaction;
+            if (pass && pass !="123"){
+                return res.status(200).send(failure("Invalid parameter"))
+            }
+            if(pass==="123"){
+                transaction=await transactionsModel.find({}).
+                populate("buyers").
+                populate("mangas")
+            }
+            if(transaction.length>0){
+                return res.status(200).send(success("Here is your transactions",transaction))
+            }
+            else{
+                return res.status(200).send(failure("No transaction to show"))
+            }
+
+        }
+        catch(error){
+            console.log("Internal Server error",error)
+            return res.status(500).send(success("Internal Server Error"));
+
         }
     }
     
