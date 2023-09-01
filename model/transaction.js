@@ -1,24 +1,31 @@
 const mongoose = require("mongoose");
 
 const transactionsSchema = new mongoose.Schema({
-    buyer:{
-        type:mongoose.Types.ObjectId,
-        ref:"buyers",
-        required:[true,"user id is required"],
-    },
-    mangas:{
-        type:[{id: mongoose.Types.ObjectId,
-            quantity:Number,
-        }],
-        ref:"mangas",
-        required:[true,"at least one mangas id is required"],
-    },
+    buyer: [
+        {
+            id: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "buyers", 
+            }
+        },
+    ],
+    
+    mangas: [
+        {
+            id: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "mangas",
+            },
+            quantity: Number,
+        },
+    ],
+    
    
 
 
 },
 {timestamps:true})
 
-const Transactions = mongoose.model("transaction", transactionsSchema);
+const Transactions = mongoose.model("transactions", transactionsSchema);
 
 module.exports = Transactions;

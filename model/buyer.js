@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 const buyersSchema = new mongoose.Schema({
     id: {
+        unique:true,
         type: Number,
         required: true,
       },
