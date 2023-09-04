@@ -6,6 +6,8 @@ const castController = require("../controller/castController");
 const {createValidation,createValidationUpdate,createValidationStock,createValidationRating,createValidationAddStock,createValidationDiscount} =require("../middleware/validation");
 const validator=require("../middleware/validation2");
 const castCreateValidation=require("../middleware/castValidation");
+const loginController = require("../controller/loginController");
+const loginValidation = require("../middleware/loginValidation");
 // routes.get("/all", castController.getAll);
 // routes.post("/create", castCreateValidation, castController.create);
 // routes.get("/getbyid", castController.getById);
@@ -17,7 +19,8 @@ routes.get("/getalltransactions",castController.getAllTransactions);
 routes.get("/getallmangas",castController.getAllMangas);
 routes.get("/getmangaprice",castController.transactionPrice);
 routes.put("/addtransaction",castController.addTransaction);
-
+routes.post("/createLogin",loginValidation.create,loginController.signUp);
+routes.post("/login",loginController.login);
 
 
 // routes.get("/all", productController.getAll);
