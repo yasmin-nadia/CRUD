@@ -50,7 +50,7 @@ class castController {
                     return res.status(200).send(failure("Failed to add the user"));
 
                 });
-            return res.status(200).send(success("Successful", cast));
+            // return res.status(200).send(success("Successful", cast));
         }
         catch (error) {
             console.log("Error while creating", error);

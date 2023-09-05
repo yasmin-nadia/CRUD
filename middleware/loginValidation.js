@@ -18,8 +18,13 @@ const validator={
         withMessage("Password must be string").
         bail().
         isStrongPassword({minLength:8, minLowercase:1, minUppercase:1, minNumbers:1,minSymbols:1}).
-        withMessage("Password must contain at least 8 charecters with 1 lowercase, 1 uppercase, 1 number and 1 special charecter")
-
+        withMessage("Password must contain at least 8 charecters with 1 lowercase, 1 uppercase, 1 number and 1 special charecter"),
+        body("name")
+        .exists()
+        .withMessage("Name must be given")
+        .bail()
+        .isString()
+        .withMessage("Name must be in string format")
        
     ]
 }

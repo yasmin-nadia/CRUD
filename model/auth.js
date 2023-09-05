@@ -2,22 +2,38 @@ const mongoose = require("mongoose");
 const authSchema = new mongoose.Schema({
     id: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "users", 
+        ref: "users",
     },
 
     email: {
-     
+
         type: String,
-        unique:true,
-        required:[true,"email is required"]
+        required: [true, "email is required"]
 
     },
 
     password: {
         type: String,
-        required:[true,"password is required"]
+        required: [true, "password is required"]
 
-    }
+    },
+    role: {
+        type: Boolean,
+        required: [true, "role is required"]
+    },
+    
+    blocked: {
+        type: Boolean,
+        default: false,
+    },
+    loginAttempts: [
+        {
+            timestamp: {
+                type: Date,
+                required: true,
+            },
+        },
+    ]
 })
 const authModel = mongoose.model("authentications", authSchema);
 
