@@ -17,7 +17,7 @@ routes.delete("/deletebyid",isAuthorised,isAdmin, castController.deleteById);
 // routes.put("/updatebyid", isAuthorised,isAdmin,castCreateValidation,castController.updateMovie);
 routes.post("/createtransaction",isAuthorised,isUser,castController.createTransaction);
 // routes.get("/getalltransactions",castController.getAllTransactions);
-// routes.get("/getallmangas",castController.getAllMangas);
+routes.get("/getallmangas",castController.getAllMangas);
 // routes.get("/getmangaprice",castController.transactionPrice);
 // routes.put("/addtransaction",castController.addTransaction);
 routes.post("/createLogin",loginValidation.create,loginController.signUp);
