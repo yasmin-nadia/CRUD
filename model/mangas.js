@@ -26,6 +26,10 @@ const mangasSchema = new mongoose.Schema({
         type: Number,
         default: 0,
       },
+      category: {
+        type: String,
+        default: "No category",
+      },
 })
 
 const Manga = mongoose.model("mangas", mangasSchema);
