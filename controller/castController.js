@@ -8,6 +8,7 @@ const buyersModel = require("../model/buyer")
 const mangasModel = require("../model/mangas")
 const transactionsModel = require("../model/transaction")
 const cartModel = require("../model/cart")
+const reviewModel = require("../model/review")
 const checkoutModel = require("../model/checkouts")
 const express = require("express")
 const app = express();
@@ -279,6 +280,76 @@ class castController {
         }
 
     }
+    async addReview(req, res) {
+        try {
+            let { user, manga, reviewText, recommended, rate } = req.body;
+            const userItem = await userModel.findById(user);
+            let mangaItem = await mangasModel.findById(manga);
+            if (!userItem) {
+                return res.status(404).send(failure(`User with ID ${user} not found`));
+            }
+            if (!mangaItem) {
+                return res.status(404).send(failure(`Manga with ID ${manga} not found`));
+            }
+            const existingReview = await reviewModel.findOne({ user, manga });
+
+            if (existingReview) {
+                existingReview.reviewText.push(reviewText);
+                existingReview.recommended = recommended
+                existingReview.rate = rate
+                if (mangaItem.rate === 0) {
+                    console.log("mangaItem", mangaItem)
+                    mangaItem.rate = rate
+                    console.log("1st if working")
+                }
+                else {
+
+                    mangaItem.rate = (mangaItem.rate + rate) / 2;
+                    console.log("else working")
+                }
+
+                await mangaItem.save()
+                await existingReview.save()
+                    .then((data) => {
+                        return res.status(200).send(success("New review added to the existing review", { Review: data }));
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                        return res.status(500).send(failure("Failed to add to the existing review"));
+                    });
+            }
+            else {
+                const newReview = new reviewModel({ user, manga, rate, reviewText, recommended });
+                mangaItem.review.push(newReview._id);
+                if (mangaItem.rate === 0) {
+                    mangaItem.rate = rate
+                    console.log("mangaItem", mangaItem)
+                    console.log(" 2nd if working")
+                }
+                else {
+
+                    mangaItem.rate = (mangaItem.rate + rate) / 2;
+                    console.log("else working")
+                }
+
+                await mangaItem.save()
+                await newReview.save()
+                    .then((data) => {
+                        return res.status(200).send(success("New review added", { Review: data }));
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                        return res.status(500).send(failure("Failed to add the review"));
+                    });
+            }
+
+        }
+        catch (error) {
+            console.log("Error while adding review", error)
+            res.status(500).send("Internal server error")
+        }
+
+    }
     async deleteFromCart(req, res) {
         try {
             const { user, mangas } = req.body;
@@ -298,7 +369,7 @@ class castController {
                         return res.status(404).send(failure(`Insufficient amount. Can not delete ID ${mangas[0].id}`));
                     }
                     else if (mangas[0].quantity === existingManga.quantity) {
-                        
+
                         const mangaIndex = cartItem.mangas.findIndex(cartManga => cartManga.id.equals(mangas[0].id));
                         if (mangaIndex !== -1) {
                             cartItem.mangas.splice(mangaIndex, 1);
@@ -312,7 +383,7 @@ class castController {
                                 });
                         }
                     } else {
-                       
+
                         existingManga.quantity -= mangas[0].quantity;
                         const mangaItem = await mangasModel.findById(mangas[0].id);
                         const sub = mangas[0].quantity * mangaItem.price
@@ -373,14 +444,14 @@ class castController {
                     }
                 }
 
-              
+
                 for (const cartManga of cartItem.mangas) {
                     const mangaItem = await mangasModel.findById(cartManga.id);
                     mangaItem.stock -= cartManga.quantity;
                     await mangaItem.save();
                 }
 
-       
+
 
                 const newCheckout = new checkoutModel({
                     cart: cartItem._id,
@@ -419,6 +490,8 @@ class castController {
         }
 
     }
+
+
 
     async getAllMangas(req, res) {
         // object destructuring
@@ -551,7 +624,14 @@ class castController {
 
 
             // Find documents that match the query
-            const mangas = await mangasModel.find(query, null, options);
+            const mangas = await mangasModel.find(query, null, options).populate({
+                path: 'review',
+                select: '-_id reviewText user', // Include the user field from the review
+                populate: {
+                    path: 'user', // Specify the path to populate
+                    select: '-_id name', // Select the username field from the user
+                },
+            });
 
 
             if (mangas.length > 0) {

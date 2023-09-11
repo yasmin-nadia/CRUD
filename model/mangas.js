@@ -30,6 +30,16 @@ const mangasSchema = new mongoose.Schema({
         type: String,
         default: "No category",
       },
+      review: [
+        {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "reviews", 
+        }],
+      rate:{
+        type:Number,
+        default:0
+      }
+    
 })
 
 const Manga = mongoose.model("mangas", mangasSchema);

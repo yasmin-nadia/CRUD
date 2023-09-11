@@ -26,6 +26,8 @@ routes.post("/login",loginController.login);
 routes.post("/addtocart",cartValidator,castController.addToCart);
 routes.delete("/deletefromcart",cartValidator,castController.deleteFromCart);
 routes.get("/checkout",checkoutValidator,castController.checkout);
+routes.post("/addreview",castController.addReview);
+
 
 
 // routes.get("/all", productController.getAll);
